@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="LoyverseProject" default="release" basedir=".">
+
+	<property name="lib.requirements" value="requirements.txt" />
+	<property name="venv.dir" value="venv" />
+	<property name="build.dir" value="build" />
+	<property name="python.version" value="3.8"/>
+	<property name="conda" value="C:\Users\LShushin\AppData\Local\anaconda3\Scripts\conda.exe"/>
+ 	<property name="venv.bin" value="${venv.dir}\Scripts"/>
+	
+	<target name="pre-clean" >
+        <echo message="Cleaning up conda venv..." />
+		<delete dir="${venv.dir}" failonerror="false" />
+    </target>
+	
+	<target name="create-conda-venv">
+		<echo message="Deleting conda virtual environment './${venv.dir}' if exist.." />
+		<delete dir="./${venv.dir}" failonerror="false" />
+	    <echo message="Creating conda virtual environment..." />
+	    <exec executable="${conda}">
+	        <arg value="create"/>
+	    	<arg value="--prefix"/>
+	    	<arg value="./${venv.dir}"/>
+	    	<arg value="python=${python.version}"/>
+	    </exec>
+	</target>
+
+	<target name="install-deps">
+		<echo>pip install other dependencies which requires for the final bundle in virtual environment (With CPU)...</echo>
+		<exec executable="${venv.bin}/pip">
+	        <arg value="install"/>
+			<arg value="--upgrade"/>
+			<arg value="pyinstaller"/>
+	    </exec>
+		<echo message="Installing other dependencies which requires for the final bundle in virtual environment..." />
+		<exec executable="${venv.bin}/pip">
+	        <arg value="install"/>
+			<arg value="--upgrade"/>
+	        <arg value="-r"/>
+	        <arg value="${lib.requirements}"/>
+	    </exec>
+	</target>
+	
+	<target name="install-environment">
+		<antcall target="create-conda-venv"/>
+		<antcall target="install-deps"/>
+	</target>
+	
+	<target name="post-clean">
+        <echo message="Cleaning up ..." />
+		<delete dir="${pyinstall.output}" failonerror="false" />
+		<delete dir="${venv.dir}" failonerror="false" />
+    </target>
+</project>
